@@ -21,17 +21,3 @@
  * @copyright   2024 Solomonov Ifraim mr.ifraim@yandex.ru
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-function get_cohort_members($cohortid) {
-    global $DB;
-
-    $sql = "SELECT userid FROM {cohort_members}
-            WHERE cohortid = :cohortid";
-    $params = ['cohortid' => $cohortid];
-    $cohortmembers = $DB->get_records_sql($sql, $params);
-    $userids = array_values(array_map(function($member) {
-        return $member->userid;
-    }, $cohortmembers));
-
-    return $userids;
-}

@@ -27,5 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Grades report';
 $string['select_cohort'] = 'Select cohort';
+$string['select_semestr'] = 'Select semestr';
 $string['export'] = 'Export';
 $string['all_groups'] = 'All groups';
