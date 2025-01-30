@@ -18,7 +18,7 @@
  * Export grades sessions across multiple courses.
  *
  * @package     report_grades
- * @copyright   2024 Solomonov Ifraim mr.ifraim@yandex.ru
+ * @copyright   2025 Solomonov Ifraim mr.ifraim@yandex.ru
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,61 +31,88 @@ require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
 
 $cohortid = required_param('cohort', PARAM_INT);
-
-$context = context_system::instance();
-//require_capability('report/grades:view', $context);
-
-$modattendance = $DB->get_record('modules', array('name' => 'attendance'));
-$cohortmembers = get_cohort_members($cohortid);
-$courses = [];
+$categorypath = required_param('semestr', PARAM_NOTAGS);
 
 global $DB;
-$sql = "SELECT DISTINCT c.*
-            FROM {enrol} e
-            JOIN {course} c
-            WHERE e.enrol = 'cohort' AND e.customint1 = :cohortid";
-$cohortcourses = $DB->get_records_sql($sql, ['cohortid' => $cohortid]);
 
+// Запрашиваем список студентов из группы.
+$sql = "
+    SELECT
+        user.id AS id,
+        user.lastname AS lastname,
+        user.firstname AS firstname,
+        user.email AS email,
+        cohort.name AS cohort
+    FROM {cohort} cohort
+    JOIN {cohort_members} cm ON cm.cohortid = cohort.id
+    JOIN {user} user ON user.id = cm.userid
+    WHERE cohort.id = :cohortid
+    ORDER BY user.lastname, user.firstname";
+$params = ['cohortid' => $cohortid];
+$students = $DB->get_records_sql($sql, $params);
+$cohortname = $DB->get_field('cohort', 'name', ['id' => $cohortid]);
 
+// Создаём файл excel.
 require_once("$CFG->libdir/excellib.class.php");
-$filename = clean_filename('Отчет '.$cohortname.' '.userdate(time(), '%Y-%m-%d').'.xls');
-
+$filename = clean_filename('Отчет по оценкам '.$cohortname.' '.userdate(time(), '%Y-%m-%d').'.xls');
 $workbook = new MoodleExcelWorkbook("-");
-
 // Sending HTTP headers.
 $workbook->send($filename);
 
-// foreach ($exportdata as $data) {
-//     $myxls = $workbook->add_worksheet($data->course);
-//     // Format types.
-//     $formatbc = $workbook->add_format();
-//     $formatbc->set_bold(1);
+$myxls = $workbook->add_worksheet("Отчет");
+// Задаем номера столбцов.
+$column_student = 0;
+$column_cohort = 1;
+$column_email = 2;
+// Format types.
+$formatbc = $workbook->add_format();
+$formatbc->set_bold(1);
+// Пишем заголовки.
+$myxls->write(0, $column_student, get_string('tabhead_student', 'report_grades'), $formatbc);
+$myxls->write(0, $column_cohort, get_string('tabhead_cohort', 'report_grades'), $formatbc);
+$myxls->write(0, $column_email, get_string('tabhead_email', 'report_grades'), $formatbc);
+// Вносим студентов в таблицу.
+$row = 1;
+foreach ($students as $student) {
+    $myxls->write($row, $column_student, $student->lastname.' '.$student->firstname);
+    $myxls->write($row, $column_cohort, $student->cohort);
+    $myxls->write($row, $column_email, $student->email);
+    $student->row = $row; // Запоминаем, в какой строке студент.
+    $row++;
+}
 
-//     $myxls->write(0, 0, get_string('course'), $formatbc);
-//     $myxls->write(0, 1, $data->course);
+$sql = "
+    SELECT
+        user.id AS userid,
+        course.fullname AS coursename,
+        grades.finalgrade AS grade
+    FROM {cohort} cohort
+    JOIN {cohort_members} cm ON cm.cohortid = cohort.id
+    JOIN {user} user ON user.id = cm.userid
+    JOIN {grade_grades} grades ON grades.userid = user.id
+    JOIN {grade_items} items ON items.id = grades.itemid
+    JOIN {course} course ON course.id = items.courseid
+    JOIN {course_categories} categories ON categories.id = course.category
+    WHERE cohort.id = :cohortid
+      AND items.itemtype LIKE 'course'
+      AND categories.path LIKE :categorypath
+    ORDER BY course.fullname, user.lastname, user.firstname";
+$params = ['cohortid' => $cohortid, 'categorypath' => $categorypath.'%'];
+$grades = $DB->get_recordset_sql($sql, $params);
 
-//     $i = 3;
-//     $j = 0;
-//     foreach ($data->tabhead as $cell) {
-//         // Merge cells if the heading would be empty (remarks column).
-//         if (empty($cell)) {
-//             $myxls->merge_cells($i, $j - 1, $i, $j);
-//         } else {
-//             $myxls->write($i, $j, $cell, $formatbc);
-//         }
-//         $j++;
-//     }
-//     $i++;
-//     $j = 0;
-//     foreach ($data->table as $row) {
-//         foreach ($row as $cell) {
-//             $myxls->write($i, $j++, $cell);
-//         }
-//         $i++;
-//         $j = 0;
-//     }
-// }
+$currentcourse = '';
+$column = 2;
+foreach ($grades as $grade) {
+    if (empty($currentcourse) || $currentcourse !== $grade->coursename) {
+        $column++;
+        $currentcourse = $grade->coursename;
+        $myxls->write(0, $column, $currentcourse, $formatbc);
+    }
 
+    $myxls->write($students[$grade->userid]->row, $column, $grade->grade);
+}
+
+$grades->close();
 $workbook->close();
 
 exit;
