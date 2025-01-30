@@ -18,7 +18,7 @@
  * Main plugin page
  *
  * @package     report_grades
- * @copyright   2024 Solomonov Ifraim mr.ifraim@yandex.ru
+ * @copyright   2025 Solomonov Ifraim mr.ifraim@yandex.ru
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -43,7 +43,7 @@ $mform = new report_grades\form\export();
 // Обрабатываем данные формы после отправки
 if ($mform->is_submitted() && $mform->is_validated()) {
     $data = $mform->get_data();
-    redirect(new moodle_url('/report/grades/export.php', ['cohort' => $data->cohort]));
+    redirect(new moodle_url('/report/grades/export.php', ['cohort' => $data->cohort, 'semestr' => $data->semestr]));
 }
 
 echo $OUTPUT->header(); // Выводим заголовок страницы
