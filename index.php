@@ -28,7 +28,7 @@ require_once($CFG->dirroot.'/cohort/lib.php');
 
 require_login();
 
-admin_externalpage_setup('reportgrades', '', null, '', array('pagelayout'=>'report'));
+admin_externalpage_setup('reportgrades', '', null, '', ['pagelayout' => 'report']);
 
 $context = context_system::instance();
 $PAGE->set_context($context);
@@ -40,16 +40,16 @@ $cohorts = cohort_get_cohorts($context->id, 0, 0);
 
 $mform = new report_grades\form\export();
 
-// Обрабатываем данные формы после отправки
+// Обрабатываем данные формы после отправки.
 if ($mform->is_submitted() && $mform->is_validated()) {
     $data = $mform->get_data();
     redirect(new moodle_url('/report/grades/export.php', ['cohort' => $data->cohort, 'semestr' => $data->semestr]));
 }
 
-echo $OUTPUT->header(); // Выводим заголовок страницы
+echo $OUTPUT->header(); // Выводим заголовок страницы.
 
-// Отображаем форму
+// Отображаем форму.
 $mform->display();
 
-echo $OUTPUT->footer(); // Выводим подвал страницы
+echo $OUTPUT->footer(); // Выводим подвал страницы.
 

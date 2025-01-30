@@ -37,16 +37,16 @@ class export extends \moodleform {
         $this->add_action_buttons(false, get_string('export', 'report_grades'));
     }
 
-    // Метод для получения списка кохорт
+    // Метод для получения глобальных групп.
     private function get_cohort_options() {
         global $CFG;
         require_once($CFG->dirroot.'/cohort/lib.php');
 
-        $options = array();
-        
+        $options = [];
+
         $context = \context_system::instance();
         $cohorts = cohort_get_cohorts($context->id, 0, 0, 'КТ');
-        
+
         foreach ($cohorts['cohorts'] as $cohort) {
             $options[$cohort->id] = format_string($cohort->name);
         }
@@ -54,12 +54,12 @@ class export extends \moodleform {
         return $options;
     }
 
-    // Метод для получения списка семестров
+    // Mетод для получения списка семестров.
     private function get_semestr_options() {
         global $DB;
 
-        $options = array();
-        
+        $options = [];
+
         $sql = "
             SELECT half.id AS id, year.name AS yearname, half.name AS halfname, half.path AS path
             FROM {course_categories} year
@@ -68,7 +68,6 @@ class export extends \moodleform {
             ORDER BY yearname, halfname DESC";
         $query = $DB->get_records_sql($sql);
 
-        
         foreach ($query as $semestr) {
             $name = explode(' ', $semestr->yearname)[1];
             $name .= ' '.$semestr->halfname;

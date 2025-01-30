@@ -24,6 +24,8 @@
 
 define('NO_OUTPUT_BUFFERING', true);
 
+require_login();
+
 require_once(dirname(__FILE__).'/../../config.php');
 require_once($CFG->dirroot.'/mod/attendance/locallib.php');
 require_once($CFG->dirroot.'/report/grades/lib.php');
@@ -61,22 +63,22 @@ $workbook->send($filename);
 
 $myxls = $workbook->add_worksheet("Отчет");
 // Задаем номера столбцов.
-$column_student = 0;
-$column_cohort = 1;
-$column_email = 2;
+$columnstudent = 0;
+$columncohort = 1;
+$columnemail = 2;
 // Format types.
 $formatbc = $workbook->add_format();
 $formatbc->set_bold(1);
 // Пишем заголовки.
-$myxls->write(0, $column_student, get_string('tabhead_student', 'report_grades'), $formatbc);
-$myxls->write(0, $column_cohort, get_string('tabhead_cohort', 'report_grades'), $formatbc);
-$myxls->write(0, $column_email, get_string('tabhead_email', 'report_grades'), $formatbc);
+$myxls->write(0, $columnstudent, get_string('tabhead_student', 'report_grades'), $formatbc);
+$myxls->write(0, $columncohort, get_string('tabhead_cohort', 'report_grades'), $formatbc);
+$myxls->write(0, $columnemail, get_string('tabhead_email', 'report_grades'), $formatbc);
 // Вносим студентов в таблицу.
 $row = 1;
 foreach ($students as $student) {
-    $myxls->write($row, $column_student, $student->lastname.' '.$student->firstname);
-    $myxls->write($row, $column_cohort, $student->cohort);
-    $myxls->write($row, $column_email, $student->email);
+    $myxls->write($row, $columnstudent, $student->lastname.' '.$student->firstname);
+    $myxls->write($row, $columncohort, $student->cohort);
+    $myxls->write($row, $columnemail, $student->email);
     $student->row = $row; // Запоминаем, в какой строке студент.
     $row++;
 }
