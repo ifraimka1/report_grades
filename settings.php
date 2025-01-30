@@ -18,7 +18,7 @@
  * Settings for grades report
  *
  * @package     report_grades
- * @copyright   2024 Solomonov Ifraim mr.ifraim@yandex.ru
+ * @copyright   2025 Solomonov Ifraim mr.ifraim@yandex.ru
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
