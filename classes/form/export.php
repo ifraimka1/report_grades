@@ -18,7 +18,7 @@
  * Export form
  *
  * @package     report_grades
- * @copyright   2024 Solomonov Ifraim mr.ifraim@yandex.ru
+ * @copyright   2025 Solomonov Ifraim mr.ifraim@yandex.ru
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ class export extends \moodleform {
         $mform->setType('cohort', PARAM_INT);
 
         $mform->addElement('autocomplete', 'semestr', get_string('select_semestr', 'report_grades'), $this->get_semestr_options());
-        $mform->setType('semestr', PARAM_INT);
+        $mform->setType('semestr', PARAM_NOTAGS);
 
         $this->add_action_buttons(false, get_string('export', 'report_grades'));
     }
@@ -61,7 +61,7 @@ class export extends \moodleform {
         $options = array();
         
         $sql = "
-            SELECT half.id AS id, year.name AS yearname, half.name AS halfname
+            SELECT half.id AS id, year.name AS yearname, half.name AS halfname, half.path AS path
             FROM {course_categories} year
             JOIN {course_categories} half ON half.parent = year.id
             WHERE half.name LIKE '%семестр%'
@@ -72,7 +72,7 @@ class export extends \moodleform {
         foreach ($query as $semestr) {
             $name = explode(' ', $semestr->yearname)[1];
             $name .= ' '.$semestr->halfname;
-            $options[$semestr->id] = $name;
+            $options[$semestr->path] = $name;
         }
 
         return $options;
