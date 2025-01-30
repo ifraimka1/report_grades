@@ -19,7 +19,7 @@
  *
  * @package     report_grades
  * @category    string
- * @copyright   2024 Solomonov Ifraim mr.ifraim@yandex.ru
+ * @copyright   2025 Solomonov Ifraim mr.ifraim@yandex.ru
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,3 +30,7 @@ $string['select_cohort'] = 'Select cohort';
 $string['select_semestr'] = 'Select semestr';
 $string['export'] = 'Export';
 $string['all_groups'] = 'All groups';
+
+$string['tabhead_student'] = 'Fullname';
+$string['tabhead_cohort'] = 'Cohort';
+$string['tabhead_email'] = 'e-mail';
