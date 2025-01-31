@@ -69,9 +69,7 @@ class export extends \moodleform {
         $query = $DB->get_records_sql($sql);
 
         foreach ($query as $semestr) {
-            $name = explode(' ', $semestr->yearname)[1];
-            $name .= ' '.$semestr->halfname;
-            $options[$semestr->path] = $name;
+            $options[$semestr->path] = $semestr->yearname.' '.$semestr->halfname;
         }
 
         return $options;
