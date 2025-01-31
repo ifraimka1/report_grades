@@ -24,13 +24,11 @@
 
 define('NO_OUTPUT_BUFFERING', true);
 
-require_login();
-
 require_once(dirname(__FILE__).'/../../config.php');
 require_once($CFG->dirroot.'/mod/attendance/locallib.php');
-require_once($CFG->dirroot.'/report/grades/lib.php');
 require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->dirroot.'/cohort/lib.php');
+
+require_login();
 
 $cohortid = required_param('cohort', PARAM_INT);
 $categorypath = required_param('semestr', PARAM_NOTAGS);
@@ -98,6 +96,7 @@ $sql = "
     WHERE cohort.id = :cohortid
       AND items.itemtype LIKE 'course'
       AND categories.path LIKE :categorypath
+      AND grades.finalgrade NOT NULL
     ORDER BY course.fullname, user.lastname, user.firstname";
 $params = ['cohortid' => $cohortid, 'categorypath' => $categorypath.'%'];
 $grades = $DB->get_recordset_sql($sql, $params);
@@ -111,7 +110,7 @@ foreach ($grades as $grade) {
         $myxls->write(0, $column, $currentcourse, $formatbc);
     }
 
-    $myxls->write($students[$grade->userid]->row, $column, $grade->grade);
+    $myxls->write($students[$grade->userid]->row, $column, round($grade->grade, 2));
 }
 
 $grades->close();
