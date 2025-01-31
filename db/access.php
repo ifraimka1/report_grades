@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Capabilities.
  *
  * @package     report_grades
  * @copyright   2025 Solomonov Ifraim mr.ifraim@yandex.ru
@@ -24,8 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'report_grades';
-$plugin->release = '0.1.1';
-$plugin->version = 2025013100;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_BETA;
+$capabilities = [
+    'report/grader:view' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ]
+    ]
+];
