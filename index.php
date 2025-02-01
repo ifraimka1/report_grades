@@ -28,7 +28,7 @@ require_once($CFG->dirroot.'/cohort/lib.php');
 
 require_login();
 $context = context_system::instance();
-require_capability('report/grader:view', $context);
+require_capability('report/grades:view', $context);
 
 admin_externalpage_setup('reportgrades', '', null, '', ['pagelayout' => 'report']);
 

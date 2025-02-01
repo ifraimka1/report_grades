@@ -34,3 +34,5 @@ $string['all_groups'] = 'Все группы';
 $string['tabhead_student'] = 'ФИО';
 $string['tabhead_cohort'] = 'Группа';
 $string['tabhead_email'] = 'Адрес электронной почты';
+
+$string['grades:view'] = 'Просматривать отчеты по оценкам';

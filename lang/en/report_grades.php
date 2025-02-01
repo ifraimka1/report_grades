@@ -34,3 +34,5 @@ $string['all_groups'] = 'All groups';
 $string['tabhead_student'] = 'Fullname';
 $string['tabhead_cohort'] = 'Cohort';
 $string['tabhead_email'] = 'e-mail';
+
+$string['grades:view'] = 'View grader reports';

@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die;
 $ADMIN->add('reports',
     new admin_externalpage('reportgrades',
     get_string('pluginname', 'report_grades'),
-    "$CFG->wwwroot/report/grades/index.php"));
+    "$CFG->wwwroot/report/grades/index.php", 'report/grades:view'));
 
 // No report settings.
 $settings = null;
