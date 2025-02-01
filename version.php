@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'report_grades';
-$plugin->release = '0.1.1';
-$plugin->version = 2025013100;
+$plugin->release = '0.1.2';
+$plugin->version = 2025020100;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_BETA;

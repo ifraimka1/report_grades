@@ -45,6 +45,7 @@ $mform = new report_grades\form\export();
 // Обрабатываем данные формы после отправки.
 if ($mform->is_submitted() && $mform->is_validated()) {
     $data = $mform->get_data();
+    $data->cohort = implode(',', $data->cohort);
     redirect(new moodle_url('/report/grades/export.php', ['cohort' => $data->cohort, 'semestr' => $data->semestr]));
 }
 

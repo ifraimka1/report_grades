@@ -30,31 +30,41 @@ require_once($CFG->libdir.'/formslib.php');
 
 require_login();
 
-$cohortid = required_param('cohort', PARAM_INT);
+$cohortsid = required_param('cohort', PARAM_TEXT);
+$cohortsid = explode(',', $cohortsid);
 $categorypath = required_param('semestr', PARAM_NOTAGS);
 
 global $DB;
 
 // Запрашиваем список студентов из группы.
+[$sqlin, $params] = $DB->get_in_or_equal($cohortsid, SQL_PARAMS_NAMED);
 $sql = "
     SELECT
         user.id AS id,
         user.lastname AS lastname,
         user.firstname AS firstname,
         user.email AS email,
-        cohort.name AS cohort
+        GROUP_CONCAT(cohort.name ORDER BY cohort.name SEPARATOR ', ') AS cohort
     FROM {cohort} cohort
     JOIN {cohort_members} cm ON cm.cohortid = cohort.id
     JOIN {user} user ON user.id = cm.userid
-    WHERE cohort.id = :cohortid
-    ORDER BY user.lastname, user.firstname";
-$params = ['cohortid' => $cohortid];
+    WHERE cohort.id $sqlin
+    GROUP BY user.id, user.lastname, user.firstname, user.email
+    ORDER BY cohort.name, user.lastname, user.firstname";
 $students = $DB->get_records_sql($sql, $params);
-$cohortname = $DB->get_field('cohort', 'name', ['id' => $cohortid]);
+
+$sql = "
+    SELECT cohort.name
+    FROM {cohort} cohort
+    WHERE cohort.id $sqlin
+";
+$cohortnames = $DB->get_records_sql($sql, $params);
+$cohortnames = array_column($cohortnames, 'name');
+$cohortnames = implode(', ', $cohortnames);
 
 // Создаём файл excel.
 require_once("$CFG->libdir/excellib.class.php");
-$filename = clean_filename('Отчет по оценкам '.$cohortname.' '.userdate(time(), '%Y-%m-%d').'.xls');
+$filename = clean_filename('Отчет по оценкам '.$cohortnames.' '.userdate(time(), '%Y-%m-%d').'.xls');
 $workbook = new MoodleExcelWorkbook("-");
 // Sending HTTP headers.
 $workbook->send($filename);
@@ -93,12 +103,12 @@ $sql = "
     JOIN {grade_items} items ON items.id = grades.itemid
     JOIN {course} course ON course.id = items.courseid
     JOIN {course_categories} categories ON categories.id = course.category
-    WHERE cohort.id = :cohortid
+    WHERE cohort.id $sqlin
       AND items.itemtype LIKE 'course'
       AND categories.path LIKE :categorypath
       AND grades.finalgrade IS NOT NULL
-    ORDER BY course.fullname, user.lastname, user.firstname";
-$params = ['cohortid' => $cohortid, 'categorypath' => $categorypath.'%'];
+    ORDER BY course.fullname, cohort.name, user.lastname, user.firstname";
+$params = array_merge($params, ['categorypath' => $categorypath.'%']);
 $grades = $DB->get_recordset_sql($sql, $params);
 
 $currentcourse = '';
