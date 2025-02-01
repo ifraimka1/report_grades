@@ -96,7 +96,7 @@ $sql = "
     WHERE cohort.id = :cohortid
       AND items.itemtype LIKE 'course'
       AND categories.path LIKE :categorypath
-      AND grades.finalgrade NOT NULL
+      AND grades.finalgrade IS NOT NULL
     ORDER BY course.fullname, user.lastname, user.firstname";
 $params = ['cohortid' => $cohortid, 'categorypath' => $categorypath.'%'];
 $grades = $DB->get_recordset_sql($sql, $params);
