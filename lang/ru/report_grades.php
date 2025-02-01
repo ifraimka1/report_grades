@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Отчет по оценкам';
-$string['select_cohort'] = 'Выберите группу';
+$string['select_cohort'] = 'Выберите группы';
 $string['select_semestr'] = 'Выберите семестр';
 $string['export'] = 'Скачать';
 $string['all_groups'] = 'Все группы';

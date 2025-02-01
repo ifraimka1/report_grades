@@ -28,8 +28,8 @@ class export extends \moodleform {
     public function definition() {
         $mform =& $this->_form;
 
-        $mform->addElement('autocomplete', 'cohort', get_string('select_cohort', 'report_grades'), $this->get_cohort_options());
-        $mform->setType('cohort', PARAM_INT);
+        $mform->addElement('autocomplete', 'cohort', get_string('select_cohort', 'report_grades'), $this->get_cohort_options(), ['multiple' => true]);
+        $mform->setType('cohort', PARAM_SEQUENCE);
 
         $mform->addElement('autocomplete', 'semestr', get_string('select_semestr', 'report_grades'), $this->get_semestr_options());
         $mform->setType('semestr', PARAM_NOTAGS);
