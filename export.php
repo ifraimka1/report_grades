@@ -77,6 +77,9 @@ $columnemail = 2;
 // Format types.
 $formatbc = $workbook->add_format();
 $formatbc->set_bold(1);
+
+$formatred = $workbook->add_format();
+$formatred->set_color('red');
 // Пишем заголовки.
 $myxls->write(0, $columnstudent, get_string('tabhead_student', 'report_grades'), $formatbc);
 $myxls->write(0, $columncohort, get_string('tabhead_cohort', 'report_grades'), $formatbc);
@@ -114,13 +117,19 @@ $grades = $DB->get_recordset_sql($sql, $params);
 $currentcourse = '';
 $column = 2;
 foreach ($grades as $grade) {
-    if (empty($currentcourse) || $currentcourse !== $grade->coursename) {
+    $coursename = explode(",", $grade->coursename)[0];
+    
+    if (empty($currentcourse) || $currentcourse !== $coursename) {
         $column++;
-        $currentcourse = $grade->coursename;
+        $currentcourse = $coursename;
         $myxls->write(0, $column, $currentcourse, $formatbc);
     }
 
-    $myxls->write($students[$grade->userid]->row, $column, round($grade->grade, 2));
+    if ($grade->grade < 60) {
+        $myxls->write($students[$grade->userid]->row, $column, round($grade->grade, 2), $formatred);
+    } else {
+        $myxls->write($students[$grade->userid]->row, $column, round($grade->grade, 2));
+    }
 }
 
 $grades->close();
