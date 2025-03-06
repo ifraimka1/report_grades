@@ -24,9 +24,9 @@
 
 define('NO_OUTPUT_BUFFERING', true);
 
-require_once(dirname(__FILE__).'/../../config.php');
-require_once($CFG->dirroot.'/mod/attendance/locallib.php');
-require_once($CFG->libdir.'/formslib.php');
+require_once(dirname(__FILE__) . '/../../config.php');
+require_once($CFG->dirroot . '/mod/attendance/locallib.php');
+require_once($CFG->libdir . '/formslib.php');
 
 require_login();
 
@@ -64,7 +64,7 @@ $cohortnames = implode(', ', $cohortnames);
 
 // Создаём файл excel.
 require_once("$CFG->libdir/excellib.class.php");
-$filename = clean_filename('Отчет по оценкам '.$cohortnames.' '.userdate(time(), '%Y-%m-%d').'.xls');
+$filename = clean_filename('Отчет по оценкам ' . $cohortnames . ' ' . userdate(time(), '%Y-%m-%d') . '.xls');
 $workbook = new MoodleExcelWorkbook("-");
 // Sending HTTP headers.
 $workbook->send($filename);
@@ -87,15 +87,15 @@ $myxls->write(0, $columnemail, get_string('tabhead_email', 'report_grades'), $fo
 // Вносим студентов в таблицу.
 $row = 1;
 foreach ($students as $student) {
-    $myxls->write($row, $columnstudent, $student->lastname.' '.$student->firstname);
+    $myxls->write($row, $columnstudent, $student->lastname . ' ' . $student->firstname);
     $myxls->write($row, $columncohort, $student->cohort);
     $myxls->write($row, $columnemail, $student->email);
     $student->row = $row; // Запоминаем, в какой строке студент.
     $row++;
 }
 
-$sql = "
-    SELECT
+$sql =
+    "SELECT
         user.id AS userid,
         course.fullname AS coursename,
         grades.finalgrade AS grade
@@ -106,19 +106,22 @@ $sql = "
     JOIN {grade_items} items ON items.id = grades.itemid
     JOIN {course} course ON course.id = items.courseid
     JOIN {course_categories} categories ON categories.id = course.category
+    LEFT JOIN {enrol} e ON e.courseid = course.id
+    LEFT JOIN {user_enrolments} ue ON ue.enrolid = e.id AND ue.userid = user.id
     WHERE cohort.id $sqlin
       AND items.itemtype LIKE 'course'
       AND categories.path LIKE :categorypath
       AND grades.finalgrade IS NOT NULL
+      AND ue.id IS NOT NULL
     ORDER BY course.fullname, cohort.name, user.lastname, user.firstname";
-$params = array_merge($params, ['categorypath' => $categorypath.'%']);
+$params = array_merge($params, ['categorypath' => $categorypath . '%']);
 $grades = $DB->get_recordset_sql($sql, $params);
 
 $currentcourse = '';
 $column = 2;
 foreach ($grades as $grade) {
     $coursename = explode(",", $grade->coursename)[0];
-    
+
     if (empty($currentcourse) || $currentcourse !== $coursename) {
         $column++;
         $currentcourse = $coursename;
